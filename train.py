@@ -34,6 +34,8 @@ def save_summary(writer, loss_dict, global_step, tag, lr=None, momentum=None):
 
 def main(args): 
 
+    setup_seed() 
+
     # dataset 
     train_dataset = DssDataset(data_root=args.data_root, split='train') 
     val_dataset = DssDataset(data_root=args.data_root, split='val') 
@@ -108,9 +110,9 @@ def main(args):
                                                                                             batched_gt_bboxes=batched_gt_bboxes, 
                                                                                             batched_gt_labels=batched_labels)
             
-            # reshape  b x h x w x c -> b x c x h x w -> n x c
+            # reshape  b x c x h x w -> b x h x w x c -> n x c 
             bbox_cls_pred = bbox_cls_pred.permute(0, 2, 3, 1).reshape(-1, args.nclasses)
-            bbox_pred = bbox_pred.permute(0, 2, 3, 1).reshape(-1, 7)                      #  x, y, z, w, l, h, ry
+            bbox_pred = bbox_pred.permute(0, 2, 3, 1).reshape(-1, 7)                     #  x, y, z, w, l, h, ry
             bbox_dir_cls_pred = bbox_dir_cls_pred.permute(0, 2, 3, 1).reshape(-1, 2)      # why?? 
 
             # anchor_target_dict ?? 
@@ -233,8 +235,8 @@ def main(args):
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Configuration Parameters')
     parser.add_argument('--data_root', default='/workspace/DssDataset', help='your data root for DssDataset')
-    parser.add_argument('--saved_path', default='pillar_logs/test')
-    parser.add_argument('--batch_size', type=int, default=4)
+    parser.add_argument('--saved_path', default='pillar_logs/test2_nclases-3')
+    parser.add_argument('--batch_size', type=int, default=6)
     parser.add_argument('--num_workers', type=int, default=4)
     parser.add_argument('--nclasses', type=int, default=3)
     parser.add_argument('--init_lr', type=float, default=0.00025)

@@ -8,9 +8,14 @@ import torch
 
 
 def inference(pc, ckpt_path): 
+    # CLASSES = {
+    #     'Unknown': 0,
+    # } 
     CLASSES = {
-        'Unknown': 0,
-    } 
+        'Pedestrian': 0, 
+        'Cyclist': 1, 
+        'Car': 2
+    }
 
     LABEL2CLASSES = {v:k for k, v in CLASSES.items()} 
 
@@ -18,13 +23,11 @@ def inference(pc, ckpt_path):
     model = PointPillars(nclasses=len(CLASSES)).cuda()  
     model.load_state_dict(torch.load(ckpt_path)) 
 
-    # load point cloud (input data)
-    pc_torch = torch.from_numpy(pc) 
+    # load point cloud (input data) 
+    pc_torch = torch.from_numpy(pc).cuda() 
 
     model.eval() 
     with torch.no_grad():
-        output = model(batched_pts=[pc_torch], mode='test')[0] 
+        output = model(batched_pts=[pc_torch], mode='test')[0]
 
-    lidar_bboxes, labels, scores = output['lidar_bboxes'], output['labels'], output['scores'] 
-
-    return lidar_bboxes, labels, scores
+    return output

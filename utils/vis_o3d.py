@@ -22,7 +22,6 @@ def pcd2npy(pcd):
 def make_cuboid_from_inference(output_bboxes): 
 
     cuboids = [] 
-    print(type(output_bboxes))
     for bbox in output_bboxes: 
         center, dimension, rotation = bbox[:3], bbox[3:6], bbox[6] 
 
@@ -149,7 +148,6 @@ def visualize_bboxes_3d(bboxes_3d, color=[1, 0, 0]):
         line_set.colors = o3d.utility.Vector3dVector([color for _ in range(len(edges))])
         line_sets.append(line_set)
 
-        
         # 큐보이드의 중심점 시각화를 위한 작은 구 생성
         sphere = o3d.geometry.TriangleMesh.create_sphere(radius=0.1)  # 구의 반지름을 설정
         sphere.translate(center)  # 구를 큐보이드의 중심으로 이동
@@ -265,14 +263,18 @@ if __name__ == '__main__':
     from utils import read_ply, read_dss_label, read_dss_label_by_box, inference 
 
     ply_path = '/workspace/DssDataset/rawData/Car/N01S01M01/Design0018/PCD/000000009325.ply' 
-    label_path = '/workspace/DssDataset/labelingData/Car/N01S01M01/Design0018/outputJson/Cuboid/000000009325.json' 
-    ckpt_path = '/workspace/PointPillars_Dss/pillar_logs/test/checkpoints/pointpillars_39.pth'
+    label_path = '/workspace/DssDataset/labelingData/Car/N01S01M01/Design0018/outputJson/Cuboid/000000009325.json'  
+    # ply_path = '/workspace/DssDataset/rawData/Car/N02S01M04/Design0045/PCD/000000026966.ply'
+    # label_path = '/workspace/DssDataset/labelingData/Car/N02S01M04/Design0045/outputJson/Cuboid/000000026966.json'
+    ckpt_path = '/workspace/pointpillars-dss/pillar_logs/test1/checkpoints/pointpillars_159.pth'
     point_cloud_range=[-40, -40, -3, 40, 40, 1]
 
     pc = read_ply(ply_path) 
 
     
     gt_bboxes = read_dss_label_by_box(label_path) if label_path is not None else None 
-    output_bboxes, labels, scores = inference(pc, ckpt_path) if ckpt_path is not None else None, None, None 
-
+    output = inference(pc, ckpt_path) if ckpt_path is not None else None
+    output_bboxes, labels, scores = output['lidar_bboxes'], output['labels'], output['scores']
+    print('labels: ', labels) 
+    print('scores: ', scores)
     visualizer(pc, gt_bboxes=gt_bboxes, output_bboxes=output_bboxes, point_cloud_range=point_cloud_range)
