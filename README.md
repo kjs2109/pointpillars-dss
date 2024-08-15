@@ -31,7 +31,7 @@ $ docker run -it --shm-size=8g --gpus all \
              -e DISPLAY=$DISPLAY -v /tmp/.X11-unix:/tmp/.X11-unix:rw \
              -v ./pointpillars-dss:/workspace/pointpillars-dss \
              -v ./DssDataset:/workspace/DssDataset \
-             jusungkim/pointpillars-devel:v1.2  
+             jusungkim/pointpillar-devel:v1.2  
 
 # 5. setup and build 
 $ cd /workspace/pointpillars-dss
