@@ -4,7 +4,7 @@
 3D object detection 모델 학습을 위한 베이스라인 코드 
 ![pointpillars](./src/pointpillars_inference1.png)
 ### support model 
-* pointpillars
+* [PointPillars](https://arxiv.org/pdf/1812.05784)
 ### support dataset 
 * DssDataset
 
