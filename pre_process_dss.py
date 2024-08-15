@@ -14,6 +14,22 @@ sys.path.append(CUR)
 from utils import write_pickle 
 
 
+def default_data_split(data_root): 
+    scenarios = sorted([scenario for scenario in os.listdir(data_root) if os.path.isdir(os.path.join(data_root, scenario))]) 
+
+    scenario_count = len(scenarios) 
+    train_index = int(scenario_count * 0.8) 
+    val_index = int(scenario_count * 0.1) + train_index
+
+    split_data = {
+        'train': scenarios[:train_index], 
+        'val': scenarios[train_index:val_index], 
+        'test': scenarios[val_index:], 
+    }
+    
+    return split_data 
+
+
 def create_dataframe(folder_structer): 
 
     root_dir = folder_structer['root_dir'] 
@@ -22,8 +38,8 @@ def create_dataframe(folder_structer):
     raw_data_type = folder_structer['raw_data_type']
     sub_data_type = folder_structer['sub_data_type']
     label_type = folder_structer['label_type']
-    split_info = folder_structer['split']
-
+    split_info = folder_structer['split'] if folder_structer['split'] != {} else default_data_split(os.path.join(root_dir, raw_data)) 
+    print(split_info)
     scenarios = [] 
     curr_scenario = []
 
@@ -38,7 +54,6 @@ def create_dataframe(folder_structer):
     for scenario in os.listdir(os.path.join(root_dir, raw_data)): 
         scenarios.append(scenario) 
 
-        split
         if split_info['train'] and scenario in split_info['train']: 
             split_type = 'train' 
         elif split_info['val'] and scenario in split_info['val']: 
@@ -234,11 +249,12 @@ if __name__ == '__main__':
         'raw_data_type': 'PCD', 
         'sub_data_type': 'Image_RGB', 
         'label_type': 'outputJson/Cuboid', 
-        'split': {
-            'train': ['N01S01M01'], 
-            'val': ['N02S01M04'], 
-            'test': ['N50S01M04'],
-        }
+        'split': {}  # 자동으로 train : val : test = 8 : 1 : 1 split 
+        # 'split': {
+        #     'train': ['N01S01M01', 'N02S01M04', 'N04S01M10', 'N09S03M03', 'N11S03M09', 'N16S05M01', 'N18S05M04', 'N19S13M01'], 
+        #     'val': ['N23S06M11'], 
+        #     'test': ['N25S07M06'],
+        # }
     }
 
     main(args, folder_structer)
