@@ -34,10 +34,11 @@ $ docker run -it --shm-size=8g --gpus all \
              jusungkim/pointpillar-devel:v1.2  
 
 # 5. setup and build 
-$ cd /workspace/pointpillars-dss
-$ python ops/setup.py develop 
+$ cd /workspace/pointpillars-dss/ops
+$ python setup.py develop 
 
 # 6. prepare dss dataset
+$ cd ..
 $ python pre_process_dss.py  
 ```
 
