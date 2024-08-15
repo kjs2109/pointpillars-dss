@@ -260,13 +260,11 @@ if __name__ == '__main__':
     CUR = os.path.dirname(os.path.abspath(__file__))
     sys.path.append(os.path.dirname(CUR))
 
-    from utils import read_ply, read_dss_label, read_dss_label_by_box, inference 
+    from utils import read_ply, read_dss_label_by_box, inference 
 
-    ply_path = '/workspace/DssDataset/rawData/Car/N01S01M01/Design0018/PCD/000000009325.ply' 
-    label_path = '/workspace/DssDataset/labelingData/Car/N01S01M01/Design0018/outputJson/Cuboid/000000009325.json'  
-    # ply_path = '/workspace/DssDataset/rawData/Car/N02S01M04/Design0045/PCD/000000026966.ply'
-    # label_path = '/workspace/DssDataset/labelingData/Car/N02S01M04/Design0045/outputJson/Cuboid/000000026966.json'
-    ckpt_path = '/workspace/pointpillars-dss/pillar_logs/test1/checkpoints/pointpillars_159.pth'
+    ply_path = '/workspace/pointpillars-dss/demo/ply_datas/000000014158.ply'
+    label_path = '/workspace/pointpillars-dss/demo/cuboid_labels/000000014158.json'
+    ckpt_path = '/workspace/pointpillars-dss/demo/checkpoints/pointpillars_159.pth'
     point_cloud_range=[-40, -40, -3, 40, 40, 1]
 
     pc = read_ply(ply_path) 
