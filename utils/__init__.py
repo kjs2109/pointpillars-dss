@@ -1,7 +1,7 @@
 from .io import read_pickle, write_pickle, read_ply, load_pcd_from_ply, read_dss_label, read_dss_label_by_box
-from .process import limit_period, iou2d_nearest 
+from .process import limit_period, iou2d_nearest, iou3d 
 from .vis_o3d import visualizer 
-from .detection import inference
+from .detection import inference, inference_from_model
 
 
 

@@ -31,3 +31,23 @@ def inference(pc, ckpt_path):
         output = model(batched_pts=[pc_torch], mode='test')[0]
 
     return output
+
+
+def inference_from_model(batched_pts, model, mode='test'): 
+    CLASSES = {
+        'Unknown': 0, 
+        'Unknown1': 1, 
+        'Unknown2': 2,
+    } 
+    # CLASSES = {
+    #     'Pedestrian': 0, 
+    #     'Cyclist': 1, 
+    #     'Car': 2
+    # }
+
+
+    model.eval() 
+    with torch.no_grad(): 
+        batched_output = model(batched_pts=batched_pts, mode=mode)
+
+    return batched_output

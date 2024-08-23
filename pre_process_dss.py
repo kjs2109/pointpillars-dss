@@ -249,7 +249,11 @@ if __name__ == '__main__':
         'raw_data_type': 'PCD', 
         'sub_data_type': 'Image_RGB', 
         'label_type': 'outputJson/Cuboid', 
-        'split': {}  # 자동으로 train : val : test = 8 : 1 : 1 split 
+        'split': {
+            'train': ['N01S01M01'], 
+            'val': ['N02S01M04'], 
+            'test': ['N50S01M04'] 
+        }  # 자동으로 train : val : test = 8 : 1 : 1 split 
         # 'split': {
         #     'train': ['N01S01M01', 'N02S01M04', 'N04S01M10', 'N09S03M03', 'N11S03M09', 'N16S05M01', 'N18S05M04', 'N19S13M01'], 
         #     'val': ['N23S06M11'], 

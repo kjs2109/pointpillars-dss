@@ -14,6 +14,8 @@ class DssDataset(Dataset):
 
     CLASSES = {
         'Unknown': 0, 
+        'Unknown1': 1, 
+        'Unknown2': 2,
     }
 
     def __init__(self, data_root, split): 
@@ -51,5 +53,6 @@ class DssDataset(Dataset):
 
 if __name__ == '__main__': 
 
-    dss_dataset = DssDataset(data_root='/workspace/DssDataset', split='train')
-    print(dss_dataset.__getitem__(9))
+    dss_dataset = DssDataset(data_root='/workspace/DssDataset', split='val')
+    print(len(dss_dataset))
+    print(dss_dataset.__getitem__(1))

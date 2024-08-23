@@ -1,6 +1,7 @@
 import copy 
 import numpy as np 
 import torch 
+from ops.iou3d_module import boxes_overlap_bev, boxes_iou_bev
 
 
 
@@ -70,4 +71,38 @@ def iou2d_nearest(bboxes1, bboxes2):
     bboxes1_bev = nearest_bev(bboxes1)
     bboxes2_bev = nearest_bev(bboxes2)
     iou = iou2d(bboxes1_bev, bboxes2_bev)
+    return iou
+
+
+def iou3d(bboxes1, bboxes2):
+    '''
+    bboxes1: (n, 7), (x, y, z, w, l, h, theta)
+    bboxes2: (m, 7)
+    return: (n, m)
+    '''
+    # 1. height overlap
+    bboxes1_bottom, bboxes2_bottom = bboxes1[:, 2], bboxes2[:, 2] # (n, ), (m, )
+    bboxes1_top, bboxes2_top = bboxes1[:, 2] + bboxes1[:, 5], bboxes2[:, 2] + bboxes2[:, 5] # (n, ), (m, )
+    bboxes_bottom = torch.maximum(bboxes1_bottom[:, None], bboxes2_bottom[None, :]) # (n, m) 
+    bboxes_top = torch.minimum(bboxes1_top[:, None], bboxes2_top[None, :])
+    height_overlap =  torch.clamp(bboxes_top - bboxes_bottom, min=0)
+
+    # 2. bev overlap
+    bboxes1_x1y1 = bboxes1[:, :2] - bboxes1[:, 3:5] / 2
+    bboxes1_x2y2 = bboxes1[:, :2] + bboxes1[:, 3:5] / 2
+    bboxes2_x1y1 = bboxes2[:, :2] - bboxes2[:, 3:5] / 2
+    bboxes2_x2y2 = bboxes2[:, :2] + bboxes2[:, 3:5] / 2
+    bboxes1_bev = torch.cat([bboxes1_x1y1, bboxes1_x2y2, bboxes1[:, 6:]], dim=-1)
+    bboxes2_bev = torch.cat([bboxes2_x1y1, bboxes2_x2y2, bboxes2[:, 6:]], dim=-1)
+    bev_overlap = boxes_overlap_bev(bboxes1_bev, bboxes2_bev) # (n, m)
+
+    # 3. overlap and volume
+    overlap = height_overlap * bev_overlap
+    volume1 = bboxes1[:, 3] * bboxes1[:, 4] * bboxes1[:, 5]
+    volume2 = bboxes2[:, 3] * bboxes2[:, 4] * bboxes2[:, 5]
+    volume = volume1[:, None] + volume2[None, :] # (n, m)
+
+    # 4. iou
+    iou = overlap / (volume - overlap + 1e-8)
+
     return iou
