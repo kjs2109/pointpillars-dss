@@ -25,7 +25,7 @@ pointpillars-workspace
         └── labelingData
 
 # 4. docker pull and run 
-$ docker pull jusungkim/pointpillars-devel:v1.2
+$ docker pull jusungkim/pointpillar-devel:v1.2
 $ docker run -it --shm-size=8g --gpus all \
              --name pointpillars-workspace \
              -e DISPLAY=$DISPLAY -v /tmp/.X11-unix:/tmp/.X11-unix:rw \
