@@ -49,9 +49,16 @@ $ python pre_process_dss.py
 $ python train.py --saved_path pillar_logs/exp1_test --batch_size 4 
 
 # inference 
-$ python utils/vis_o3d.py 
+$ python utils/vis_o3d.py
+
+# evaluation
+$ python evaluation.py
 
 # experiment tracking 
 $ tensorboard --logdir pillar_logs/{exp_name}/summary 
 
 ```
+
+## Troubleshooting 
+1. `python utils/vis_o3d.py` 오류 발생 시, 호스트 터미널에서 `xhost +local:docker` 명령어 실행 
+
