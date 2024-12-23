@@ -5,6 +5,7 @@ from tqdm import tqdm
 
 import random 
 import numpy as np 
+import matplotlib.pyplot as plt
 from dataset import DssDataset, get_dataloader 
 from model import PointPillars 
 from loss import Loss 
@@ -30,6 +31,33 @@ def save_summary(writer, loss_dict, global_step, tag, lr=None, momentum=None):
     
     if momentum is not None: 
         writer.add_scalar('momentum', momentum, global_step) 
+
+
+def check_and_mkdir(target_path):
+    target_path = os.path.abspath(target_path)
+    path_to_targets = os.path.split(target_path)
+
+    if '.' in path_to_targets[-1]: 
+        path_to_targets = path_to_targets[:-1] 
+    
+    path_history = '/'
+    for path in path_to_targets:
+        path_history = os.path.join(path_history, path)
+        if not os.path.exists(path_history):
+            os.mkdir(path_history)
+
+
+def save_plot(dice_score_log, save_path): 
+
+    check_and_mkdir(save_path)
+
+    plt.figure(figsize=(10, 8))
+    plt.plot(dice_score_log)
+    plt.xlabel("Epoch")
+    plt.ylabel("Loss")
+    plt.title("Loss Curve")
+    plt.savefig(save_path)
+    plt.close()
 
 
 def main(args): 
@@ -84,6 +112,7 @@ def main(args):
     os.makedirs(saved_ckpt_path, exist_ok=True) 
 
     # train loop 
+    total_loss_log = [] 
     for epoch in range(args.max_epoch): 
         print('=' * 20, epoch, '=' * 20)
         train_step, val_step = 0, 0 
@@ -112,16 +141,16 @@ def main(args):
             
             # reshape  b x c x h x w -> b x h x w x c -> n x c 
             bbox_cls_pred = bbox_cls_pred.permute(0, 2, 3, 1).reshape(-1, args.nclasses)
-            bbox_pred = bbox_pred.permute(0, 2, 3, 1).reshape(-1, 7)                     #  x, y, z, w, l, h, ry
-            bbox_dir_cls_pred = bbox_dir_cls_pred.permute(0, 2, 3, 1).reshape(-1, 2)      # why?? 
+            bbox_pred = bbox_pred.permute(0, 2, 3, 1).reshape(-1, 7)  #  x, y, z, w, l, h, ry
+            bbox_dir_cls_pred = bbox_dir_cls_pred.permute(0, 2, 3, 1).reshape(-1, 2)     
 
-            # anchor_target_dict ?? 
+            # anchor_target_dict  
             batched_bbox_labels = anchor_target_dict['batched_labels'].reshape(-1)
             batched_bbox_reg = anchor_target_dict['batched_bbox_reg'].reshape(-1, 7) 
             batched_dir_labels = anchor_target_dict['batched_dir_labels'].reshape(-1)
 
-            batched_label_weights = anchor_target_dict['batched_label_weights'].reshape(-1)
             # batched_bbox_reg_weights = anchor_target_dict['batched_bbox_reg_weights'].reshape(-1)
+            batched_label_weights = anchor_target_dict['batched_label_weights'].reshape(-1)
             # batched_dir_labels_weights = anchor_target_dict['batched_dir_labels_weights'].reshape(-1)  
 
             pos_idx = (batched_bbox_labels >= 0) & (batched_bbox_labels < args.nclasses)  
@@ -164,6 +193,9 @@ def main(args):
                              momentum=optimizer.param_groups[0]['betas'][0]) 
                 
             train_step += 1  
+
+        total_loss_log.append(loss_dict['total_loss'].item()) 
+        save_plot(total_loss_log, os.path.join(saved_logs_path, 'loss_curve.png')) 
 
         if (epoch + 1) % args.ckpt_freq_epoch == 0: 
             torch.save(pointpillars.state_dict(), os.path.join(saved_ckpt_path, f'pointpillars_{epoch}.pth'))
