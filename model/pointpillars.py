@@ -244,10 +244,11 @@ class PointPillars(nn.Module):
         self.head = Head(in_channel=384, n_anchors=2*nclasses, n_classes=nclasses)
         
         # anchors
-        ranges = [[0, -39.68, -0.6, 69.12, 39.68, -0.6],
-                    [0, -39.68, -0.6, 69.12, 39.68, -0.6],
-                    [0, -39.68, -1.78, 69.12, 39.68, -1.78]]
-        sizes = [[0.6, 0.8, 1.73], [0.6, 1.76, 1.73], [1.6, 3.9, 1.56]]
+        ranges = [[-40, -40, -3, 40, 40, 1], 
+                    [-40, -40, -3, 40, 40, 1], 
+                    [-40, -40, -3, 40, 40, 1]] 
+        
+        sizes = [[0.6, 0.8, 1.73], [0.6, 1.76, 1.73], [1.6, 3.9, 1.56]]  # predestrian, cyclist, car 
         rotations=[0, 1.57]
         self.anchors_generator = Anchors(ranges=ranges, 
                                          sizes=sizes, 
@@ -411,6 +412,7 @@ class PointPillars(nn.Module):
                                                nclasses=self.nclasses)
             
             return bbox_cls_pred, bbox_pred, bbox_dir_cls_pred, anchor_target_dict
+        
         elif mode == 'val':
             results = self.get_predicted_bboxes(bbox_cls_pred=bbox_cls_pred, 
                                                 bbox_pred=bbox_pred, 
@@ -424,5 +426,12 @@ class PointPillars(nn.Module):
                                                 bbox_dir_cls_pred=bbox_dir_cls_pred, 
                                                 batched_anchors=batched_anchors)
             return results
+        
         else:
             raise ValueError   
+
+
+if __name__=='__main__': 
+    import torchinfo 
+
+    torchinfo.summary(PointPillars(), (6, 2, 496, 432)) 
